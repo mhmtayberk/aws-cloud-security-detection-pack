@@ -1,0 +1,22 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "Root",
+        "principalId": "123456789012",
+        "arn": "arn:aws:iam::123456789012:root",
+        "accountId": "123456789012",
+        "accessKeyId": "ASIA..."
+    },
+    "eventTime": "2023-10-27T10:00:00Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "RunInstances",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "192.0.2.1",
+    "userAgent": "aws-cli/2.0.0",
+    "requestParameters": {
+        "instancesSet": {}
+    },
+    "responseElements": null,
+    "additionalEventData": {},
+    "requestID": "e1234567-..."
+}

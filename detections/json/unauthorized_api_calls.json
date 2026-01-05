@@ -1,0 +1,38 @@
+{
+    "rule_id": "unauthorized_api_calls",
+    "title": "Unauthorized API Calls (Access Denied)",
+    "description": "Detects a high frequency of 'AccessDenied' errors. This can indicate compromised credentials being used to map out permissions (Reconnaissance) or a misconfigured application.",
+    "severity": "medium",
+    "author": "Antigravity",
+    "status": "siem_aggregation_required",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "reconnaissance",
+        "mitre_t1087"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "errorCode",
+                "operator": "IN",
+                "value": [
+                    "AccessDenied",
+                    "Client.UnauthorizedOperation"
+                ]
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Misconfigured applications retrying requests",
+        "Developers testing permissions"
+    ],
+    "recommendation": "Investigate the 'sourceIPAddress' and 'userAgent'. If the source is external and unfamiliar, revoke credentials immediately."
+}

@@ -1,0 +1,25 @@
+{
+    "rule_id": "s3_lifecycle_expiration_ransomware",
+    "title": "S3 Data Destruction via Lifecycle Rule",
+    "description": "Detects the creation of an S3 Lifecycle rule that is configured to effectively delete (expire) all objects in a bucket within a very short timeframe (e.g., 1 day). This is a technique used by modern cloud ransomware to destroy data backups without triggering mass-deletion alerts.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "impact",
+        "ransomware",
+        "mitre_t1485"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "PutBucketLifecycle"
+    },
+    "false_positives": [
+        "Cost optimization policies on temporary/scratch buckets (verify bucket name and expiration days)"
+    ],
+    "recommendation": "Review the Lifecycle configuration immediately. If the expiration is set to < 7 days on a critical bucket, remove the rule and investigate the user."
+}

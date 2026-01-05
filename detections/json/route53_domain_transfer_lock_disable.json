@@ -1,0 +1,25 @@
+{
+    "rule_id": "route53_domain_transfer_lock_disable",
+    "title": "Route53 Domain Transfer Lock Disabled",
+    "description": "Detects the disabling of domain transfer locking. Attackers disable this lock to transfer your organization's domain name to another registrar (Domain Hijacking).",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "impact",
+        "resource_hijacking",
+        "mitre_t1496"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "DisableDomainTransferLock"
+    },
+    "false_positives": [
+        "Legitimate business decision to transfer domain management (should be highly regulated)"
+    ],
+    "recommendation": "If this was not a C-level authorized decision, re-enable the lock immediately and lock down the AWS account."
+}

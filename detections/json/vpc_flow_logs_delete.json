@@ -1,0 +1,25 @@
+{
+    "rule_id": "vpc_flow_logs_delete",
+    "title": "VPC Flow Logs Deleted",
+    "description": "Identifies the deletion of VPC Flow Logs. Flow logs are essential for network traffic analysis and forensic investigation. Deleting them is a common precursor to network-based attacks/exfiltration to hide traffic patterns.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "network",
+        "mitre_t1562.001"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "DeleteFlowLogs"
+    },
+    "false_positives": [
+        "Cost optimization scripts removing unused flow logs (verify target VPC)"
+    ],
+    "recommendation": "Confirm if the deletion was authorized. Without flow logs, you cannot trace network connection attempts or data exfiltration volume."
+}

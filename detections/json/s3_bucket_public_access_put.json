@@ -1,0 +1,45 @@
+{
+    "rule_id": "s3_bucket_public_access_put",
+    "title": "S3 Bucket Public Access Block Removed",
+    "description": "Identifies the removal or disabling of S3 'Block Public Access' settings at the bucket level. This action explicitly removes guardrails against public data exposure.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "impact",
+        "mitre_t1562.001"
+    ],
+    "query": {
+        "logic": "OR",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "DeleteBucketPublicAccessBlock"
+            },
+            {
+                "logic": "AND",
+                "conditions": [
+                    {
+                        "field": "eventName",
+                        "operator": "==",
+                        "value": "PutBucketPublicAccessBlock"
+                    },
+                    {
+                        "field": "requestParameters.PublicAccessBlockConfiguration",
+                        "operator": "CONTAINS",
+                        "value": "false"
+                    }
+                ]
+            }
+        ]
+    },
+    "false_positives": [
+        "Intentionally public buckets (e.g., static website hosting) - verify bucket name"
+    ],
+    "recommendation": "Confirm if this bucket is intended to be public. If not, re-enable Block Public Access immediately."
+}

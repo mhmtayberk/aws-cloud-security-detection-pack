@@ -1,0 +1,34 @@
+{
+    "rule_id": "ec2_modify_user_data",
+    "title": "EC2 Instance UserData Modified",
+    "description": "Detects modifications to the 'UserData' attribute of a stopped EC2 instance. UserData scripts run as root when the instance starts; modifying them is a high-privilege persistence technique to inject malware or backdoors.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "persistence",
+        "mitre_t1059.001"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "ModifyInstanceAttribute"
+            },
+            {
+                "field": "requestParameters.attribute",
+                "operator": "==",
+                "value": "userData"
+            }
+        ]
+    },
+    "false_positives": [
+        "Legitimate instance updates via automation (verify User Agent and source)"
+    ],
+    "recommendation": "Review the new UserData script content immediately. If not authorized, terminate the instance and assume it is compromised."
+}

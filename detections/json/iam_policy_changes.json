@@ -1,0 +1,53 @@
+{
+    "rule_id": "iam_policy_changes",
+    "title": "IAM Policy Modification or Detachment",
+    "description": "Detects IAM policy modifications. High volume in production environments (CI/CD, Terraform) makes this noisy. Focus on Detach/Delete events or changes to security-related roles (e.g., SecurityAudit, ReadOnly).",
+    "severity": "low",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "impact",
+        "mitre_t1562"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "IN",
+                "value": [
+                    "PutUserPolicy",
+                    "PutGroupPolicy",
+                    "PutRolePolicy",
+                    "AttachUserPolicy",
+                    "AttachGroupPolicy",
+                    "AttachRolePolicy",
+                    "DetachUserPolicy",
+                    "DetachGroupPolicy",
+                    "DetachRolePolicy",
+                    "DeleteUserPolicy",
+                    "DeleteGroupPolicy",
+                    "DeleteRolePolicy",
+                    "DeletePolicy",
+                    "DeletePolicyVersion"
+                ]
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Terraform/CloudFormation deployments (filter by userAgent: 'HashiCorp Terraform')",
+        "User offboarding (expected DetachUserPolicy)",
+        "Automated role rotation scripts"
+    ],
+    "tuning_guidance": "Whitelist CI/CD role ARNs (e.g., arn:aws:iam::*:role/TerraformRunner). Alert only on DetachUserPolicy/DeletePolicy for security-related policies (SecurityAudit, ReadOnlyAccess).",
+    "recommendation": "Verify if the policy detachment was planned. Removing 'AdministratorAccess' or audit policies is suspicious."
+}

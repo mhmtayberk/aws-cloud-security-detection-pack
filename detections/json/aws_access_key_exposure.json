@@ -1,0 +1,35 @@
+{
+    "rule_id": "aws_access_key_exposure",
+    "title": "Potential AWS Access Key Exposure",
+    "description": "Detects usage of 'GetCallerIdentity' from unusual IP addresses immediately after key creation, or from known malicious IPs. This is often the first step attacker's take to verify stolen credentials.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "discovery",
+        "mitre_t1078.004"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "GetCallerIdentity"
+            },
+            {
+                "field": "userIdentity.type",
+                "operator": "==",
+                "value": "IAMUser"
+            }
+        ]
+    },
+    "false_positives": [
+        "Developers running 'aws sts get-caller-identity' to check their session",
+        "CI/CD pipelines verifying credentials"
+    ],
+    "recommendation": "Check the Source IP. If it is not a known corporate IP or VPN, disable the access key immediately."
+}

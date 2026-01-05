@@ -1,0 +1,27 @@
+{
+    "rule_id": "config_recorder_stop",
+    "title": "AWS Config Configuration Recorder Stopped",
+    "description": "Detects when the AWS Config recorder is stopped or deleted. AWS Config tracks resource history and compliance; disabling it removes visibility into resource changes and security posture.",
+    "severity": "medium",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "mitre_t1562.001"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "IN",
+        "value": [
+            "StopConfigurationRecorder",
+            "DeleteConfigurationRecorder"
+        ]
+    },
+    "false_positives": [
+        "Planned decommissioning of an AWS account"
+    ],
+    "recommendation": "Investigate immediately. If Config was stopped, you lose historical data on resource changes. Re-enable it and check for other unauthorized changes."
+}

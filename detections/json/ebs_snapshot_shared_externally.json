@@ -1,0 +1,36 @@
+{
+    "rule_id": "ebs_snapshot_shared_externally",
+    "title": "EBS Snapshot Shared Externally",
+    "description": "Detects when an EBS snapshot is shared with an external AWS account or made public. Attackers use this to exfiltrate entire disk images without downloading data, bypassing network-based DLP.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "exfiltration",
+        "mitre_t1537"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "ModifySnapshotAttribute"
+            },
+            {
+                "field": "requestParameters.createVolumePermission.add",
+                "operator": "EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Legitimate sharing of snapshots between internal org accounts (verify target Account ID)",
+        "Public datasets hosted by the organization (rare)",
+        "Disaster Recovery (DR) replication to cold storage account"
+    ],
+    "recommendation": "Identify the target Account ID in 'requestParameters'. If unknown, revoke the permission immediately using 'reset-snapshot-attribute' and investigate the snapshot content."
+}

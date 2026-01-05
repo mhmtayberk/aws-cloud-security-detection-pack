@@ -1,0 +1,25 @@
+{
+    "rule_id": "iam_update_assume_role_policy_trust",
+    "title": "IAM Role Trust Policy Updated",
+    "description": "Detects changes to the Trust Relationship (AssumeRolePolicy) of an IAM Role. Attackers modify this to allow their own external accounts to assume legitimate roles in your environment (Backdoor/Persistence).",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "persistence",
+        "privilege_escalation",
+        "mitre_t1098"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "UpdateAssumeRolePolicy"
+    },
+    "false_positives": [
+        "Legitimate infrastructure updates via Terraform/CloudFormation (verify userAgent and changes)"
+    ],
+    "recommendation": "Review the 'policyDocument' in the log. Look for new 'Principal' entries. If an unknown Account ID or User ARN was added, this is a backdoor."
+}

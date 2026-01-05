@@ -1,0 +1,45 @@
+{
+    "rule_id": "s3_bucket_policy_changes",
+    "title": "S3 Bucket Policy or ACL Modification",
+    "description": "Detects changes to S3 bucket policies or ACLs. Malicious actors may modify these to loosen access controls or make buckets public (Data Exfiltration impact).",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "impact",
+        "mitre_t1562.007"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventSource",
+                "operator": "==",
+                "value": "s3.amazonaws.com"
+            },
+            {
+                "field": "eventName",
+                "operator": "IN",
+                "value": [
+                    "PutBucketPolicy",
+                    "DeleteBucketPolicy",
+                    "PutBucketAcl",
+                    "DeleteBucketAcl"
+                ]
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "IaC tools (Terraform/CloudFormation) managing bucket configurations"
+    ],
+    "recommendation": "Review the 'requestParameters' to see what changed. If the policy now allows 'Principal: *', it is a critical finding."
+}

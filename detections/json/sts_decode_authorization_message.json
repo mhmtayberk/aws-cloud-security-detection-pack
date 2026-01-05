@@ -1,0 +1,25 @@
+{
+    "rule_id": "sts_decode_authorization_message",
+    "title": "STS Decode Authorization Message",
+    "description": "Detects usage of the 'DecodeAuthorizationMessage' API. This action is rarely used by legitimate applications or users but is commonly used by attackers or penetration testers to debug why their permission brute-forcing attempts failed (Access Denied).",
+    "severity": "medium",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "reconnaissance",
+        "mitre_t1087"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "DecodeAuthorizationMessage"
+    },
+    "false_positives": [
+        "Developers debugging strict IAM permission issues in non-production environments",
+        "Automated security assessment tools (e.g., Prowler, ScoutSuite) running with approval"
+    ],
+    "recommendation": "Investigate the user who performed this action. Check their recent 'AccessDenied' events to see what they were trying to access. If they are not a developer with a known task, this is suspicious reconnaissance."
+}

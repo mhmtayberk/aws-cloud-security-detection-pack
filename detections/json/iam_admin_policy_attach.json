@@ -1,0 +1,45 @@
+{
+    "rule_id": "iam_admin_policy_attach",
+    "title": "AdministratorAccess Policy Attached to User/Role",
+    "description": "Detects when the AWS managed 'AdministratorAccess' policy is attached to an IAM user, group, or role. This grants full administrative privileges.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "iam",
+        "privilege_escalation",
+        "mitre_t1098"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "IN",
+                "value": [
+                    "AttachUserPolicy",
+                    "AttachGroupPolicy",
+                    "AttachRolePolicy"
+                ]
+            },
+            {
+                "field": "requestParameters.policyArn",
+                "operator": "ENDSWITH",
+                "value": ":iam::aws:policy/AdministratorAccess"
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Authorized IaC/Terraform provisioning (verify userAgent)",
+        "AWS Service Linked Role creation (usually filtered by invokedBy check)"
+    ],
+    "recommendation": "Verify if this privilege grant was authorized. Prefer least-privilege policies over full AdministratorAccess."
+}

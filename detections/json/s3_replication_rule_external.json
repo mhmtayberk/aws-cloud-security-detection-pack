@@ -1,0 +1,24 @@
+{
+    "rule_id": "s3_replication_rule_external",
+    "title": "S3 Replication Rule Created",
+    "description": "Detects the creation or update of S3 Replication configurations. Attackers may set up automatic replication to copy all data from your bucket to an external bucket they control (Bulk Exfiltration).",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "exfiltration",
+        "mitre_t1537"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "PutBucketReplication"
+    },
+    "false_positives": [
+        "Legitimate Disaster Recovery (DR) setup. Validation required: Check if the destination bucket belongs to your organization."
+    ],
+    "recommendation": "Inspect the 'ReplicationConfiguration'. Identify the destination bucket. If it is not one of your known backup locations, remove the rule immediately."
+}

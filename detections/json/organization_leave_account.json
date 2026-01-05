@@ -1,0 +1,25 @@
+{
+    "rule_id": "organization_leave_account",
+    "title": "Account Left AWS Organization",
+    "description": "Detects when an AWS account leaves an AWS Organization. This removes any Service Control Policies (SCPs) that enforce security guardrails, potentially allowing an attacker to perform previously blocked actions.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "impact",
+        "mitre_t1562.001"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "LeaveOrganization"
+    },
+    "false_positives": [
+        "Authorized organizational restructuring (extremely rare and should be scheduled)"
+    ],
+    "recommendation": "If unauthorized, this is a catastrophic security failure. The account is now unmanaged. Contact AWS Support to regain control and audit all actions taken after the departure."
+}

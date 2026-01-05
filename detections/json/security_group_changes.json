@@ -1,0 +1,47 @@
+{
+    "rule_id": "security_group_changes",
+    "title": "Security Group Ingress Open to World (0.0.0.0/0)",
+    "description": "Detects changes to Security Group rules (Ingress/Egress). This rule is intentionally generic and may be noisy in dynamic environments. For higher fidelity, use 'security_group_ingress_open_world' which filters for 0.0.0.0/0 specifically.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "use_ingress_open_world_instead",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "network",
+        "mitre_t1562.007"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "IN",
+                "value": [
+                    "AuthorizeSecurityGroupIngress",
+                    "CreateSecurityGroup"
+                ]
+            },
+            {
+                "field": "requestParameters.ipPermissions.items.ipRanges.items.cidrIp",
+                "operator": "IN",
+                "value": [
+                    "0.0.0.0/0",
+                    "::/0"
+                ]
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Public-facing Load Balancers (ALB/NLB) security groups",
+        "Temporary rules for debugging (should be removed)"
+    ],
+    "tuning_guidance": "Consider disabling this rule and using 'security_group_ingress_open_world' instead, which focuses on dangerous open-world rules only.",
+    "recommendation": "Check which port is being opened. If it is SSH (22) or RDP (3389), revoke immediately. If HTTP/HTTPS, verify it is intended for a public web server."
+}

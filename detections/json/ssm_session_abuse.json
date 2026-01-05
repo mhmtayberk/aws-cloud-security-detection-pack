@@ -1,0 +1,35 @@
+{
+    "rule_id": "ssm_session_abuse",
+    "title": "Suspicious SSM Session Manager Connection",
+    "description": "Detects the initiation of an SSM Session Manager session (shell access) to an EC2 instance. This replaces SSH and is a common target for attackers to gain interactive access without opening GuardDuty-monitored ports.",
+    "severity": "medium",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "lateral_movement",
+        "mitre_t1021"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventSource",
+                "operator": "==",
+                "value": "ssm.amazonaws.com"
+            },
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "StartSession"
+            }
+        ]
+    },
+    "false_positives": [
+        "System administrators performing maintenance",
+        "Automated runbooks"
+    ],
+    "recommendation": "Review 'target' (instance ID) and 'userIdentity'. If the user does not normally access this instance, investigate command logs in CloudWatch (if enabled)."
+}

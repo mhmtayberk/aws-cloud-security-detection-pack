@@ -1,0 +1,41 @@
+{
+    "rule_id": "rds_snapshot_shared_externally",
+    "title": "RDS Snapshot Shared Externally",
+    "description": "Detects when an RDS database snapshot is shared with an external AWS account or made public. This typically indicates an attempt to exfiltrate the entire database contents to an attacker-controlled account.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "exfiltration",
+        "database",
+        "mitre_t1537"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "ModifyDBSnapshotAttribute"
+            },
+            {
+                "field": "requestParameters.attributeName",
+                "operator": "==",
+                "value": "restore"
+            },
+            {
+                "field": "requestParameters.valuesToAdd",
+                "operator": "EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Authorized cross-account database migration (verify target Account ID)",
+        "Sharing snapshots with a disaster recovery (DR) account"
+    ],
+    "recommendation": "Identify the Account ID in 'valuesToAdd'. If it is not a known internal account, remove the permission immediately using 'modify-db-snapshot-attribute' and assume the data is compromised."
+}

@@ -1,0 +1,47 @@
+{
+    "rule_id": "console_login_without_mfa",
+    "title": "Console Login without MFA",
+    "description": "Detects successful AWS Management Console logins where Multi-Factor Authentication (MFA) was not used. This exposes the account to credential stuffing and phishing attacks.",
+    "severity": "medium",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "iam",
+        "initial_access",
+        "mitre_t1078"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "ConsoleLogin"
+            },
+            {
+                "field": "responseElements.ConsoleLogin",
+                "operator": "==",
+                "value": "Success"
+            },
+            {
+                "field": "additionalEventData.MFAUsed",
+                "operator": "==",
+                "value": "No"
+            },
+            {
+                "field": "userIdentity.type",
+                "operator": "==",
+                "value": "IAMUser"
+            }
+        ]
+    },
+    "false_positives": [
+        "SSO/Federation logins (MFA handled by IdP—already filtered via userIdentity.type)",
+        "Break-glass emergency accounts (whitelist specific usernames if needed)",
+        "Service accounts that cannot use MFA (shouldn't have console access anyway)"
+    ],
+    "recommendation": "Enforce MFA via IAM policy (deny aws:MultiFactorAuthPresent != true). If this is a break-glass account, verify the login was authorized and document it."
+}

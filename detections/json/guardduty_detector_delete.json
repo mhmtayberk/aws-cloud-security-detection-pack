@@ -1,0 +1,52 @@
+{
+    "rule_id": "guardduty_detector_delete",
+    "title": "GuardDuty Detector Deleted",
+    "description": "Identifies the deletion of a GuardDuty detector. GuardDuty is the primary threat detection service in AWS; disabling it makes the environment blind to network and account-based threats.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "mitre_t1562.001"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "IN",
+                "value": [
+                    "DeleteDetector",
+                    "UpdateDetector"
+                ]
+            },
+            {
+                "logic": "OR",
+                "conditions": [
+                    {
+                        "field": "eventName",
+                        "operator": "==",
+                        "value": "DeleteDetector"
+                    },
+                    {
+                        "field": "requestParameters.enable",
+                        "operator": "==",
+                        "value": "false"
+                    }
+                ]
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "AWS Organization wide re-configuration (check if performed by Master account)"
+    ],
+    "recommendation": "Verify if this was a planned architectural change. If unexpected, it indicates a sophisticated attacker attempting to blind security controls."
+}

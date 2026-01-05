@@ -1,0 +1,35 @@
+{
+    "rule_id": "kms_key_policy_changes",
+    "title": "KMS Key Policy Modification",
+    "description": "Detects changes to KMS Key Policies using PutKeyPolicy. This is critical because modifying a key policy can allow unauthorized users to decrypt sensitive data (Encryption Bypass) or lock out legitimate administrators.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "impact",
+        "defense_evasion",
+        "mitre_t1485"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventSource",
+                "operator": "==",
+                "value": "kms.amazonaws.com"
+            },
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "PutKeyPolicy"
+            }
+        ]
+    },
+    "false_positives": [
+        "IaC tools updating key policies during infrastructure deployment"
+    ],
+    "recommendation": "Verify the 'policyName' and 'policy' content. Ensure no wildcards (*) were added to the principal field."
+}

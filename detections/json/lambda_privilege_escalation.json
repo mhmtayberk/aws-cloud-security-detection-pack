@@ -1,0 +1,39 @@
+{
+    "rule_id": "lambda_privilege_escalation",
+    "title": "Lambda Privilege Escalation via PassRole",
+    "description": "Detects the creation or update of a Lambda function where an IAM role with administrative (or high) privileges is passed. Attackers use this to escalate privileges by executing code as a high-privilege Lambda.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "privilege_escalation",
+        "mitre_t1078.004"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "IN",
+                "value": [
+                    "CreateFunction20150331",
+                    "UpdateFunctionConfiguration20150331v2",
+                    "CreateFunction",
+                    "UpdateFunctionConfiguration"
+                ]
+            },
+            {
+                "field": "requestParameters.role",
+                "operator": "EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Legitimate deployment of maintenance Lambdas (verify the role being passed)"
+    ],
+    "recommendation": "Review the 'role' parameter. Does this Lambda really need an Admin role? If not, restrict permissions."
+}

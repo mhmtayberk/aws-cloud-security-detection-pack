@@ -1,0 +1,37 @@
+{
+    "rule_id": "iam_create_access_key_for_other_user",
+    "title": "IAM Access Key Created for Another User",
+    "description": "Detects when an IAM user or role creates an access key for a different user. This is a common persistence technique where an attacker compromises a privileged entity (e.g., a role) and creates long-term credentials for a dormant or new user to maintain access.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "iam",
+        "persistence",
+        "mitre_t1098"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "CreateAccessKey"
+            },
+            {
+                "field": "requestParameters.userName",
+                "operator": "EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Identity federation tools syncing users",
+        "IaC tools provisioning users and keys simultaneously",
+        "Self-targeting via explicit CLI argument (e.g. user passing their own username)"
+    ],
+    "recommendation": "Verify if the actor (userIdentity) is authorized to manage credentials for the target user. If the actor is an ephemeral role (e.g., assumed role), this is highly suspicious."
+}

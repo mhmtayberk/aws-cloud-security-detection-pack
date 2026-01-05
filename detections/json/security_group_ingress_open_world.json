@@ -1,0 +1,44 @@
+{
+    "rule_id": "security_group_ingress_open_world",
+    "title": "Security Group Ingress Opened to World (SSH/RDP)",
+    "description": "Detects authorization of security group rules that allow inbound traffic from 0.0.0.0/0 (Internet) to sensitive administrative ports (SSH-22, RDP-3389).",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "initial_access",
+        "mitre_t1190"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "AuthorizeSecurityGroupIngress"
+            },
+            {
+                "field": "requestParameters.ipPermissions.ipRanges.cidrIp",
+                "operator": "==",
+                "value": "0.0.0.0/0"
+            },
+            {
+                "field": "requestParameters.ipPermissions.fromPort",
+                "operator": "IN",
+                "value": [
+                    22,
+                    3389
+                ]
+            }
+        ]
+    },
+    "false_positives": [
+        "Public facing bastions (should still restrict source IP if possible)",
+        "Honeypots",
+        "Temporary Terraform/CI test cycles (open/close in seconds) - verify UserAgent"
+    ],
+    "recommendation": "Restrict the CIDR range to corporate VPN or specific IPs. Remove the rule immediately."
+}

@@ -1,0 +1,41 @@
+{
+  "rule_id": "root_account_usage",
+  "title": "Root Account Usage Detected",
+  "description": "Identifies any activity performed by the AWS Root account. The Root account should be secured and only used for specific account management tasks (e.g., billing, support plan changes). Routine usage indicates a serious security risk.",
+  "severity": "critical",
+  "author": "Antigravity",
+  "status": "production",
+  "log_source": "cloudtrail",
+  "tags": [
+    "aws",
+    "security",
+    "iam",
+    "mitre_t1078.001"
+  ],
+  "query": {
+    "logic": "AND",
+    "conditions": [
+      {
+        "field": "userIdentity.type",
+        "operator": "==",
+        "value": "Root"
+      },
+      {
+        "field": "userIdentity.invokedBy",
+        "operator": "NOT_EXISTS",
+        "value": true
+      },
+      {
+        "field": "eventType",
+        "operator": "!=",
+        "value": "AwsServiceEvent"
+      }
+    ]
+  },
+  "false_positives": [
+    "AWS Support plan changes (look for eventSource: support.amazonaws.com)",
+    "Billing and Budget management actions",
+    "Account contact information updates"
+  ],
+  "recommendation": "Investigate immediately. Determine who has the root credentials. Secure the account with MFA and use IAM roles for daily tasks."
+}

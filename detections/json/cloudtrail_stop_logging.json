@@ -1,0 +1,63 @@
+{
+    "rule_id": "cloudtrail_stop_logging",
+    "title": "CloudTrail Logging Disabled or Deleted",
+    "description": "Detects attempts to stop CloudTrail logging, delete a trail, or disable logging via UpdateTrail. This is a critical indicator of defense evasion.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "defense_evasion",
+        "mitre_t1562.001"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventSource",
+                "operator": "==",
+                "value": "cloudtrail.amazonaws.com"
+            },
+            {
+                "logic": "OR",
+                "conditions": [
+                    {
+                        "field": "eventName",
+                        "operator": "IN",
+                        "value": [
+                            "StopLogging",
+                            "DeleteTrail"
+                        ]
+                    },
+                    {
+                        "logic": "AND",
+                        "conditions": [
+                            {
+                                "field": "eventName",
+                                "operator": "==",
+                                "value": "UpdateTrail"
+                            },
+                            {
+                                "field": "requestParameters.isLogging",
+                                "operator": "==",
+                                "value": "false"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "field": "userIdentity.invokedBy",
+                "operator": "NOT_EXISTS",
+                "value": true
+            }
+        ]
+    },
+    "false_positives": [
+        "Approved infrastructure clean-up scripts",
+        "Dev/Test environment resets"
+    ],
+    "recommendation": "Check who performed the action. If unauthorized, assume the account is compromised. Re-enable logging immediately and investigate actions taken during the gap."
+}

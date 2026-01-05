@@ -1,0 +1,24 @@
+{
+    "rule_id": "kms_key_schedule_deletion",
+    "title": "KMS Key Scheduled for Deletion",
+    "description": "Detects when a Customer Master Key (CMK) in KMS is scheduled for deletion. Deleting keys renders all data encrypted by them permanently unrecoverable. This is a common ransomware/sabotage tactic.",
+    "severity": "critical",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "impact",
+        "mitre_t1485"
+    ],
+    "query": {
+        "field": "eventName",
+        "operator": "==",
+        "value": "ScheduleKeyDeletion"
+    },
+    "false_positives": [
+        "Lifecycle management of temporary keys (verify key usage)"
+    ],
+    "recommendation": "Stop the deletion immediately using CancelKeyDeletion unless strictly authorized. Investigate why the key is being destroyed."
+}

@@ -1,0 +1,47 @@
+{
+    "rule_id": "suspicious_role_assumption",
+    "title": "Suspicious Cross-Account Role Assumption",
+    "description": "Detects AssumeRole events originating from unusual or external AWS accounts. This can indicate compromised credentials being used to laterally move into your environment.",
+    "severity": "high",
+    "author": "Antigravity",
+    "status": "production",
+    "log_source": "cloudtrail",
+    "tags": [
+        "aws",
+        "security",
+        "lateral_movement",
+        "mitre_t1078"
+    ],
+    "query": {
+        "logic": "AND",
+        "conditions": [
+            {
+                "field": "eventName",
+                "operator": "==",
+                "value": "AssumeRole"
+            },
+            {
+                "field": "eventSource",
+                "operator": "==",
+                "value": "sts.amazonaws.com"
+            },
+            {
+                "field": "userIdentity.type",
+                "operator": "==",
+                "value": "AWSAccount"
+            },
+            {
+                "field": "userIdentity.accountId",
+                "operator": "NOT_IN",
+                "value": [
+                    "123456789012"
+                ]
+            }
+        ]
+    },
+    "false_positives": [
+        "Legitimate cross-account access from trusted partners",
+        "Organization accounts (Add your Organization Account IDs to the whitelist)"
+    ],
+    "recommendation": "Investigate the 'userIdentity.accountId'. If this account is not known to you, revoke the IAM role trust policy immediately."
+}
